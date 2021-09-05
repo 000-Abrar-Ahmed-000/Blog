@@ -1,0 +1,10 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+    {{ ckeditor.load() }}
+    <h2>Blog Editor</h2>
+    <form method="post">
+        {{ ckeditor.create(value="Type Content Here") }}
+        <input type="submit">
+    </form>
+{% endblock %}
