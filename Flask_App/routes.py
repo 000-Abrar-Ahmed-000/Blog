@@ -1,7 +1,8 @@
 from Flask_App import app, db, bcrypt
-from flask import render_template, url_for, flash, redirect
+from flask import render_template, url_for, flash, redirect, request
 from Flask_App.forms import RegisterForm, LoginForm
 from Flask_App.db_model import User, Post
+from flask_login import login_user, current_user, logout_user, login_required
 
 # dummy posts
 blog_posts = [
@@ -46,13 +47,10 @@ def posts():
     return render_template("posts.html", posts=blog_posts)
 
 
-@app.route('/about')
-def about():
-    return render_template('about.html')
-
-
 @app.route('/register', methods=['POST', 'GET'])
 def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
     reg_form = RegisterForm()
     if reg_form.validate_on_submit():
         hashed_password = bcrypt.generate_password_hash(reg_form.password.data).decode('UTF-8')
@@ -70,11 +68,56 @@ def register():
                            form=reg_form)
 
 
-@app.route('/login')
+@app.route('/login', methods=['POST', 'GET'])
 def login():
-    return render_template('login.html')
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    login_form = LoginForm()
+    if login_form.validate_on_submit():
+        user = User.query.filter_by(email=login_form.email.data).first()
+        if user and bcrypt.check_password_hash(user.password, login_form.password.data):
+            login_user(user, remember=login_form.remember.data)
+            next_page = request.args.get('next')
+            if next_page:
+                return redirect(next_page)
+            else:
+                flash('Login Successful. Welcome', 'success')
+                return redirect(url_for('home'))
+
+        else:
+            flash('Incorrect Credentials', 'danger')
+    return render_template('login.html',
+                           title='User Login',
+                           form=login_form)
+
+
+@app.route('/logout')
+def logout():
+    logout_user()
+    return redirect(url_for('home'))
+
+
+@app.route('/profile', methods=['POST', 'GET'])
+@login_required
+def profile():
+    pass
+
+
+@app.route('/dashboard', methods=['POST', 'GET'])
+@login_required
+def dashboard():
+    return render_template('dashboard.html',
+                           title='Dashboard')
 
 
 @app.route('/editor')
+@login_required
 def editor():
-    return render_template('blog_editor.html')
+    pass
+
+
+@app.route('/viewer')
+def viewer():
+    pass
+
+
