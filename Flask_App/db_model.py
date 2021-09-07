@@ -6,7 +6,7 @@ from flask_login import UserMixin
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-
+#   db class store user information
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
@@ -19,6 +19,7 @@ class User(db.Model, UserMixin):
         return f"User('{self.username}',{self.email}, {self.profile_image})"
 
 
+#   db class store posts
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     post_title = db.Column(db.String(200), nullable=False)

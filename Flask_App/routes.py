@@ -49,20 +49,27 @@ def posts():
 
 @app.route('/register', methods=['POST', 'GET'])
 def register():
+    #   checking if user already logged in
     if current_user.is_authenticated:
         return redirect(url_for('home'))
+    #   initiating  reg_form class
+    #   reg form contains input data --> email, username, password .. see forms.py
     reg_form = RegisterForm()
     if reg_form.validate_on_submit():
+        #   hashing password before pushing it into Database
         hashed_password = bcrypt.generate_password_hash(reg_form.password.data).decode('UTF-8')
         user = User(
             username=reg_form.username.data,
             email=reg_form.email.data,
             password=hashed_password
         )
+        #   adding user and closing DB session
         db.session.add(user)
         db.session.commit()
         flash(f'account created {reg_form.username.data}', 'success')
+        #   redirect to login page after registration successful
         return redirect(url_for('login'))
+    # form = reg_form allows form to be accessed from html pages - register.html
     return render_template('registration.html',
                            title='Register',
                            form=reg_form)
@@ -74,16 +81,21 @@ def login():
         return redirect(url_for('home'))
     login_form = LoginForm()
     if login_form.validate_on_submit():
+        #   checking if user email actually exists
         user = User.query.filter_by(email=login_form.email.data).first()
+        #   check if user has output and hashed pass matches login pass input
         if user and bcrypt.check_password_hash(user.password, login_form.password.data):
             login_user(user, remember=login_form.remember.data)
+            #   if user has been redirected from user-only page to login
+            #   next_page stores the url from which user was redirected
+            #   if login success user is redirected to the initial page
             next_page = request.args.get('next')
             if next_page:
                 return redirect(next_page)
             else:
                 flash('Login Successful. Welcome', 'success')
                 return redirect(url_for('home'))
-
+        #   if login creds are incorrect- fail message
         else:
             flash('Incorrect Credentials', 'danger')
     return render_template('login.html',
@@ -94,10 +106,12 @@ def login():
 @app.route('/logout')
 def logout():
     logout_user()
+    # logout option only visible to logged in users - see navbar.html
     return redirect(url_for('home'))
 
 
 @app.route('/profile', methods=['POST', 'GET'])
+#   decorator below requires user to login to access page
 @login_required
 def profile():
     pass
