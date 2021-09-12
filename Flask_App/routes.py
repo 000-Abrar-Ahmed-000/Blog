@@ -12,7 +12,7 @@ blog_posts = [
      },
     {'header': "Header 2",
      'title': "Article Title 2",
-     'text': "This is a little summary for Article 2"
+     'text': "This is a little summary for Article 2, "
      },
     {'header': "Header 3",
      'title': "Article Title 3",
@@ -127,7 +127,7 @@ def dashboard():
 @app.route('/editor')
 @login_required
 def editor():
-    pass
+    return render_template('blog_editor.html')
 
 
 @app.route('/viewer')

@@ -2,20 +2,24 @@
 
 
 {% block body %}
-
-    <div class="row">
-        {% for post in posts %}
-            <div class="col-sm-3">
-                <div class="card text-white bg-primary mb-3" style="max-width: 18rem;">
-                    <div class="card-header">{{ post.header }}</div>
-                    <div class="card-body">
-                        <h5 class="card-title">{{ post.title }}</h5>
-                        <p class="card-text">{{ post.text }}</p>
-                        <a href="#" class="btn btn-outline-light">Read Now</a>
-                  </div>
+    <div class="container my-5">
+        <div class="row">
+            {% for post in posts %}
+                <div class="col">
+                    <div class="card border-dark mb-3" style="width: 18rem; height: 15rem;">
+                        <div class="card-header">{{ post.header }}</div>
+                        <div class="card-body text-dark">
+                            <h5 class="card-title">{{ post.title }}</h5>
+                            <p class="card-text">{{ post.text }}</p>
+                            <a href="#" class="btn btn-outline-light">Read Now</a>
+                    </div>
+                    <div class="card-footer">
+                        <small class="text-dark">Last updated 3 mins ago</small>
+                    </div>
+                    </div>
                 </div>
-            </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
     </div>
 
 {% endblock %}
